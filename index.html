@@ -391,7 +391,7 @@
           </div>
 
           <div class="field">
-            <label>Выберите учителя</label>
+            <label>Выберите преподавателя</label>
             <label>(нажмите два раза с паузой в 1 секунду для обновления слотов)</label>
             <div class="teacher-switch">
               <button class="teacher-btn" data-teacher="Юрий" type="button">
@@ -409,7 +409,7 @@
             <div class="section-head">
               <div>
                 <label style="margin-bottom:2px;display:block">Свободные окна</label>
-                <p id="slotsHint">Сначала выберите дату и учителя.</p>
+                <p id="slotsHint">Сначала выберите дату и преподавателя.</p>
               </div>
             </div>
             <div class="slots" id="slots"></div>
@@ -430,7 +430,7 @@
       <section class="panel right">
         <div class="toolbar">
           <span class="booking-count"><span class="dot"></span> Общая база записей</span>
-          <span class="pill" id="selectionLabel">Учитель не выбран</span>
+          <span class="pill" id="selectionLabel">Преподаватель не выбран</span>
         </div>
 
         <div class="empty" style="margin-bottom:14px">
@@ -439,11 +439,11 @@
 
         <h3 style="margin-bottom:10px">Как это работает</h3>
         <p class="hint" style="margin-bottom:10px">
-          Для каждого сочетания дата + учитель + время создаётся одна запись в Firestore.
+          Для каждого сочетания дата + преподаватель + время создаётся одна запись в Firestore.
           Если слот уже занят, он блокируется для всех пользователей.
         </p>
         <p class="hint">
-          Кнопка «Посмотреть все записи» открывает список всех бронирований: кто записан, на какое время и к какому учителю.
+          Кнопка «Посмотреть все записи» открывает список всех бронирований: кто записан, на какое время и к какому преподавателю.
         </p>
       </section>
     </div>
@@ -514,7 +514,7 @@
       selectedTeacher = teacher;
       selectedSlot = null;
       teacherButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.teacher === teacher));
-      selectionLabel.textContent = teacher ? `Выбран: ${teacher}` : "Учитель не выбран";
+      selectionLabel.textContent = teacher ? `Выбран: ${teacher}` : "Преподаватель не выбран";
       renderSlots();
       loadSlots();
     }
@@ -571,8 +571,8 @@
         return;
       }
       if (!selectedTeacher){
-        slotsEl.innerHTML = '<div class="empty" style="grid-column:1/-1">Выберите учителя.</div>';
-        slotsHint.textContent = "Сначала выберите учителя.";
+        slotsEl.innerHTML = '<div class="empty" style="grid-column:1/-1">Выберите преподавателя.</div>';
+        slotsHint.textContent = "Сначала выберите преподавателя.";
         return;
       }
 
@@ -623,7 +623,7 @@
         return;
       }
       if (!selectedTeacher){
-        resultEl.textContent = "Выберите учителя.";
+        resultEl.textContent = "Выберите преподавателя.";
         return;
       }
       if (!selectedSlot){
@@ -692,7 +692,7 @@
             <th>Имя</th>
             <th>Дата</th>
             <th>Время</th>
-            <th>Учитель</th>
+            <th>Преподаватель</th>
           </tr>
         </thead>
         <tbody>
@@ -735,7 +735,7 @@
       selectedTeacher = "";
       selectedSlot = null;
       teacherButtons.forEach(btn => btn.classList.remove("active"));
-      selectionLabel.textContent = "Учитель не выбран";
+      selectionLabel.textContent = "Преподавателя не выбран";
       resultEl.textContent = "Заполните форму, чтобы подтвердить запись.";
       await refresh();
     });

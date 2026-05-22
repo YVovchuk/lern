@@ -309,7 +309,7 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <div class="pill" id="dbState"><span class="dot"></span><span>Подключение к базе...</span></div>
+        <div class="pill" id="dbState"><span class="dot"></span><span>Подключение...</span></div>
         <div class="pill hidden" id="adminBadge">Администратор</div>
         <button class="button ghost hidden" id="adminOpenBtn" type="button">Админ</button>
         <button class="button secondary hidden" id="logoutBtn" type="button">Выйти</button>
@@ -326,22 +326,22 @@
         <div class="stats">
           <div class="stat">
             <strong id="freeCount">0</strong>
-            <span>свободных слотов на выбранную дату</span>
+            <span>Свободных записей на выбранную дату</span>
           </div>
           <div class="stat">
             <strong id="bookedCount">0</strong>
-            <span>занятых слотов на выбранную дату</span>
+            <span>Занятых записей на выбранную дату</span>
           </div>
           <div class="stat">
             <strong>8</strong>
-            <span>окон с 10:00 до 17:00</span>
+            <span>Всего окон</span>
           </div>
         </div>
 
         <div class="form">
           <div class="field">
             <label for="studentName">Ваше имя</label>
-            <input id="studentName" type="text" placeholder="Например, Анна" autocomplete="name" />
+            <input id="studentName" type="text" placeholder="Например, Олеся" autocomplete="name" />
           </div>
 
           <div class="field">
@@ -401,7 +401,7 @@
 
       <section class="panel right">
         <div class="toolbar">
-          <span class="booking-count"><span class="dot"></span> Общая база записей</span>
+          <span class="booking-count"><span class="dot"></span> Календарь синхронизирован</span>
           <span class="tag" id="liveStatus">онлайн</span>
         </div>
 
@@ -583,7 +583,7 @@
     function setStatus(ok, text){
       liveStatus.textContent = text || (ok ? "онлайн" : "офлайн");
       dbState.innerHTML = ok
-        ? '<span class="dot"></span><span>Подключено к базе</span>'
+        ? '<span class="dot"></span><span>Подключено</span>'
         : '<span class="dot" style="background:var(--danger);box-shadow:0 0 0 4px rgba(220,38,38,.12)"></span><span>Ошибка базы</span>';
     }
     function isAdminEmail(emailValue){
@@ -675,7 +675,7 @@
       }
 
       const dayBookings = getBookingsFor(selectedDate, selectedTeacher);
-      slotsHint.textContent = `Слоты на ${selectedDate} для ${selectedTeacher}.`;
+      slotsHint.textContent = `Вы записываетесь на ${selectedDate} к преподавателю ${selectedTeacher}.`;
 
       times.forEach(time => {
         const booked = dayBookings.some(b => b.time === time);
@@ -978,7 +978,7 @@
         adminOpenBtn.textContent = "Админ";
         logoutBtn.classList.add("hidden");
       }
-      dbState.innerHTML = '<span class="dot"></span><span>Подключено к базе</span>';
+      dbState.innerHTML = '<span class="dot"></span><span>Подключено</span>';
       renderCalendar();
       renderTeacherButtons();
       refreshLiveListener();

@@ -170,7 +170,14 @@
     .slot strong{font-size:16px}
     .slot small{color:var(--muted);font-size:12px}
     .slot.free small{color:var(--success)}
-    .slot.booked{opacity:.52;cursor:not-allowed;text-decoration:line-through}
+    .slot.booked{
+      opacity:.95;
+      cursor:not-allowed;
+      border-color:rgba(220,38,38,.22);
+      background:rgba(220,38,38,.05);
+    }
+    .slot.booked strong{color:var(--danger)}
+    .slot.booked small{color:#991b1b}
     .slot.booked:hover{transform:none}
     .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
     .button{
@@ -682,7 +689,7 @@
         btn.setAttribute("aria-pressed", selectedSlot === time ? "true" : "false");
         btn.innerHTML = `
           <strong>${time}</strong>
-          <small>${booked ? "занято" : "свободно"}</small>
+          <small>${booked ? `занято · ${escapeHtml(item.bookedBy || "без имени")}` : "свободно"}</small>
         `;
         btn.addEventListener("click", () => {
           if (booked) return;

@@ -594,7 +594,6 @@
 
     function renderTeacherButtons(){
       teacherButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.teacher === selectedTeacher));
-      selectionLabel.textContent = selectedTeacher ? `Выбран: ${selectedTeacher}` : "Учитель не выбран";
     }
 
     function monthName(date){

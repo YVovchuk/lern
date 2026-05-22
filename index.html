@@ -267,7 +267,9 @@
 </head>
 <body>
   <div id="appView" class="wrap">
-    <div id="adminLoginPanel" class="login-card hidden" style="margin:0 auto 18px; max-width:520px;">
+    
+  <div id="adminLoginPanel" class="modal" aria-hidden="true">
+    <div class="login-card">
       <div class="brand" style="margin-bottom:14px">
         <div class="logo">ROLF</div>
         <div>
@@ -284,16 +286,18 @@
         </div>
         <div class="field">
           <label for="adminPassword">Пароль</label>
-          <input id="adminPassword" type="password" placeholder="••••••••">
+          <input id="adminPassword" type="password" placeholder="rolf2026">
         </div>
         <div class="actions">
           <button class="button primary" id="adminLoginBtn" type="button">Войти</button>
           <button class="button secondary" id="closeAdminLoginBtn" type="button">Закрыть</button>
         </div>
-        <p class="small-note">Админ-панель открывается после входа. Пользователи видят форму записи без авторизации.</p>
+        <p class="small-note">Если нужен другой логин, можно заменить значения в коде.</p>
       </div>
     </div>
-    <div class="top">
+  </div>
+
+  <div class="top">
       <div class="brand">
         <div class="logo">ROLF</div>
         <div>
@@ -444,7 +448,10 @@
       <div class="admin-tools">
         <div class="card-box">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-            <h3>Все брони</h3>
+            <div>
+              <h3>Все заявки</h3>
+              <div class="small-note" id="adminBookingsCount">0 записей</div>
+            </div>
             <button class="button secondary" id="openAllBookingsBtn" type="button">Просмотр всех записей</button>
           </div>
           <div id="adminBookingsList" class="muted-box">Загрузка...</div>
@@ -502,6 +509,7 @@
     const db = firebase.firestore();
 
     const ADMIN_EMAILS = ["admin@rolf.ru", "support@rolf.ru"];
+    const ADMIN_PASSWORD = "rolf2026";
     const times = ["10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
 
     const appView = document.getElementById("appView");
@@ -543,6 +551,7 @@
     const closeAdminBtn = document.getElementById("closeAdminBtn");
     const openAllBookingsBtn = document.getElementById("openAllBookingsBtn");
     const adminBookingsList = document.getElementById("adminBookingsList");
+    const adminBookingsCount = document.getElementById("adminBookingsCount");
     const editForm = document.getElementById("editForm");
     const editDocId = document.getElementById("editDocId");
     const editName = document.getElementById("editName");
@@ -720,6 +729,7 @@
     function renderAdminList(){
       if (!isAdmin) return;
       const rows = [...bookingsCache].sort((a,b) => `${a.date}_${a.teacher}_${a.time}`.localeCompare(`${b.date}_${b.teacher}_${b.time}`));
+      adminBookingsCount.textContent = `${rows.length} записей`;
       if (!rows.length){
         adminBookingsList.innerHTML = '<div class="muted-box">Пока нет записей.</div>';
         return;
@@ -754,11 +764,13 @@
           </table>
         </div>`;
     }
+    }
 
     function openAdmin(){
       if (!isAdmin) return;
-      adminLoginPanel.classList.add("hidden");
+      closeAdminLogin();
       loadEditTimeOptions();
+      renderAdminList();
       renderAdminTable();
       adminModal.classList.add("open");
       adminModal.setAttribute("aria-hidden", "false");
@@ -949,31 +961,33 @@
       renderCalendar();
     }
 
-    async function handleAuthState(user){
-      if (!user){
-        isAdmin = false;
-        adminBadge.classList.add("hidden");
-        adminOpenBtn.textContent = "Админ";
-        logoutBtn.classList.add("hidden");
-        adminLoginPanel.classList.add("hidden");
-        setStatus(true, "онлайн");
-        return;
-      }
 
-      const emailValue = (user.email || "").toLowerCase();
-      isAdmin = isAdminEmail(emailValue);
-
+    function syncAdminUI(){
       if (isAdmin) {
         adminBadge.classList.remove("hidden");
-        adminBadge.textContent = `Администратор · ${emailValue}`;
+        adminBadge.textContent = `Администратор`;
         adminOpenBtn.textContent = "Админ-панель";
         logoutBtn.classList.remove("hidden");
-        adminLoginPanel.classList.add("hidden");
       } else {
         adminBadge.classList.add("hidden");
         adminOpenBtn.textContent = "Админ";
         logoutBtn.classList.add("hidden");
       }
+    }
+
+    function openAdminLogin(){
+      adminLoginPanel.classList.add("open");
+      adminLoginPanel.setAttribute("aria-hidden", "false");
+    }
+
+    function closeAdminLogin(){
+      adminLoginPanel.classList.remove("open");
+      adminLoginPanel.setAttribute("aria-hidden", "true");
+    }
+
+    async function handleAuthState(){
+      isAdmin = sessionStorage.getItem("rolf_admin") === "1";
+      syncAdminUI();
       dbState.innerHTML = '<span class="dot"></span><span>Подключено к базе</span>';
       renderCalendar();
       renderTeacherButtons();
@@ -981,26 +995,41 @@
     }
 
     adminLoginBtn.addEventListener("click", async () => {
-      try{
-        await auth.signInWithEmailAndPassword(adminEmail.value.trim(), adminPassword.value);
-      }catch(err){
-        alert(err?.message || "Не удалось войти.");
+      const enteredEmail = adminEmail.value.trim().toLowerCase();
+      const enteredPassword = adminPassword.value;
+      const allowed = isAdminEmail(enteredEmail) && enteredPassword === ADMIN_PASSWORD;
+      if (!allowed) {
+        alert("Неверный email или пароль администратора.");
+        return;
       }
+      isAdmin = true;
+      sessionStorage.setItem("rolf_admin", "1");
+      syncAdminUI();
+      closeAdminLogin();
+      renderAdminList();
+      renderAdminTable();
+      renderAllBookings();
+      openAdmin();
     });
 
-    closeAdminLoginBtn.addEventListener("click", () => {
-      adminLoginPanel.classList.add("hidden");
-    });
+    closeAdminLoginBtn.addEventListener("click", closeAdminLogin);
 
     adminOpenBtn.addEventListener("click", () => {
       if (isAdmin) {
         openAdmin();
       } else {
-        adminLoginPanel.classList.toggle("hidden");
+        openAdminLogin();
       }
     });
 
-    logoutBtn.addEventListener("click", () => auth.signOut());
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem("rolf_admin");
+      isAdmin = false;
+      syncAdminUI();
+      closeAdmin();
+      closeAdminLogin();
+      renderAdminList();
+    });
 
     teacherButtons.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1023,6 +1052,7 @@
     closeAllModalBtn.addEventListener("click", closeAll);
     allModal.addEventListener("click", (e) => { if (e.target === allModal) closeAll(); });
     adminModal.addEventListener("click", (e) => { if (e.target === adminModal) closeAdmin(); });
+    adminLoginPanel.addEventListener("click", (e) => { if (e.target === adminLoginPanel) closeAdminLogin(); });
 
     deleteBookingBtn.addEventListener("click", async () => {
       if (!activeEditId) return;
@@ -1060,7 +1090,7 @@
       loadEditTimeOptions();
 
       appView.classList.remove("hidden");
-      auth.onAuthStateChanged(handleAuthState);
+      handleAuthState();
 
       db.collection("rolf_bookings").onSnapshot(snap => {
         const list = [];

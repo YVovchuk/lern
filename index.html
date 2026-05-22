@@ -8,13 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <style>
     :root{
       --bg:#f5f7fb;
       --card:rgba(255,255,255,.78);
-      --card-strong:#ffffff;
       --border:rgba(17,24,39,.08);
       --text:#111827;
       --muted:#6b7280;
@@ -22,8 +22,8 @@
       --primary-2:#7c3aed;
       --success:#16a34a;
       --danger:#dc2626;
-      --shadow:0 18px 50px rgba(17,24,39,.10);
-      --radius:24px;
+      --shadow:0 18px 55px rgba(17,24,39,.10);
+      --radius:26px;
     }
     *{box-sizing:border-box}
     body{
@@ -36,8 +36,9 @@
         radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 30%),
         linear-gradient(180deg, #eef2ff 0%, #f8fafc 48%, #eef2f7 100%);
       padding:24px;
+      overflow-x:hidden;
     }
-    .wrap{max-width:1240px;margin:0 auto}
+    .wrap{max-width:1300px;margin:0 auto}
     .top{
       display:flex;
       justify-content:space-between;
@@ -45,115 +46,71 @@
       gap:16px;
       margin-bottom:18px;
       flex-wrap:wrap;
+      animation: fadeUp .7s ease both;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
+    .brand{display:flex;align-items:center;gap:14px}
     .logo{
-      width:54px;height:54px;border-radius:16px;
+      width:58px;height:58px;border-radius:18px;
       background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
-      display:grid;
-      place-items:center;
-      font-weight:800;
-      box-shadow:0 12px 26px rgba(79,70,229,.24);
+      color:#fff;display:grid;place-items:center;
+      font-weight:800;letter-spacing:.08em;
+      box-shadow:0 14px 30px rgba(79,70,229,.24);
+      user-select:none;
     }
     .brand b{display:block;font-size:16px}
     .brand span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
     .pill{
-      padding:10px 14px;
-      border-radius:999px;
+      padding:10px 14px;border-radius:999px;
       background:rgba(17,24,39,.05);
       border:1px solid rgba(17,24,39,.06);
-      color:#1f2937;
-      font-size:13px;
-      font-weight:600;
+      color:#1f2937;font-size:13px;font-weight:600;
+      display:inline-flex;align-items:center;gap:8px;
     }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1.15fr;
-      gap:18px;
-      align-items:start;
+    .dot{
+      width:8px;height:8px;border-radius:999px;background:var(--success);display:inline-block;
+      box-shadow:0 0 0 4px rgba(22,163,74,.12);
     }
+    .grid{display:grid;grid-template-columns:1fr 1.15fr;gap:18px;align-items:start}
     .panel{
-      background:var(--card);
-      border:1px solid rgba(255,255,255,.7);
-      backdrop-filter: blur(14px);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+      background:var(--card);border:1px solid rgba(255,255,255,.7);
+      backdrop-filter: blur(16px);border-radius:var(--radius);
+      box-shadow:var(--shadow);animation: fadeUp .8s ease both;
     }
     .left,.right{padding:24px}
     h1,h2,h3{margin:0}
     h1{
-      font-size:clamp(28px,4vw,48px);
-      line-height:1.02;
-      letter-spacing:-.05em;
-      max-width:12ch;
+      font-size:clamp(30px,4.2vw,54px);
+      line-height:1.02;letter-spacing:-.055em;max-width:12ch;
     }
-    .subtitle{
-      color:var(--muted);
-      line-height:1.6;
-      margin:14px 0 0;
-      max-width:44ch;
-    }
-    .stats{
-      margin-top:20px;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
+    .subtitle{color:var(--muted);line-height:1.65;margin:14px 0 0;max-width:52ch}
+    .stats{margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
     .stat{
-      background:rgba(255,255,255,.8);
-      border:1px solid rgba(255,255,255,.9);
-      border-radius:18px;
-      padding:16px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.92);
+      border-radius:20px;padding:16px;
+      transition:transform .2s ease;
     }
+    .stat:hover{transform:translateY(-2px)}
     .stat strong{display:block;font-size:20px;margin-bottom:4px}
     .stat span{color:var(--muted);font-size:13px;line-height:1.4}
-    .form{
-      display:grid;
-      gap:14px;
+    .form{display:grid;gap:14px;margin-top:22px}
+    .field{display:grid;gap:8px}
+    label{font-size:14px;font-weight:600;color:#1f2937}
+    input,select,textarea{
+      width:100%;border:1px solid var(--border);background:rgba(255,255,255,.94);
+      border-radius:16px;padding:14px 15px;font-size:15px;outline:none;
+      transition:.18s ease;color:var(--text);font-family:inherit;
     }
-    .field{
-      display:grid;
-      gap:8px;
-    }
-    label{
-      font-size:14px;
-      font-weight:600;
-      color:#1f2937;
-    }
-    input,select{
-      width:100%;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.92);
-      border-radius:16px;
-      padding:14px 15px;
-      font-size:15px;
-      outline:none;
-      transition:.18s ease;
-      color:var(--text);
-    }
-    input:focus,select:focus{
+    textarea{min-height:96px;resize:vertical}
+    input:focus,select:focus,textarea:focus{
       border-color:rgba(79,70,229,.45);
       box-shadow:0 0 0 4px rgba(79,70,229,.10);
     }
-    .teacher-switch{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
+    .teacher-switch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .teacher-btn{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.9);
-      border-radius:16px;
-      padding:14px 12px;
-      text-align:left;
-      cursor:pointer;
-      transition:.18s ease;
-      min-height:72px;
+      border:1px solid var(--border);background:rgba(255,255,255,.9);
+      border-radius:16px;padding:14px 12px;text-align:left;cursor:pointer;
+      transition:.18s ease;min-height:72px;
     }
     .teacher-btn:hover{transform:translateY(-1px)}
     .teacher-btn.active{
@@ -163,36 +120,46 @@
     }
     .teacher-btn strong{display:block;font-size:16px}
     .teacher-btn small{color:var(--muted);font-size:12px}
-    .section-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:end;
-      gap:12px;
-      margin-top:2px;
-    }
-    .section-head p{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-    }
-    .slots{
-      display:grid;
-      grid-template-columns:repeat(2, 1fr);
-      gap:10px;
-    }
-    .slot{
+    .calendar{
+      background:rgba(255,255,255,.88);
       border:1px solid var(--border);
-      background:rgba(255,255,255,.92);
-      border-radius:18px;
-      padding:14px 12px;
-      min-height:84px;
-      text-align:left;
-      cursor:pointer;
-      transition:.18s ease;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
+      border-radius:22px;padding:14px;
+    }
+    .cal-head{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;
+    }
+    .cal-head strong{font-size:15px;letter-spacing:-.02em;text-transform:capitalize}
+    .nav-btn{
+      width:40px;height:40px;border-radius:12px;border:1px solid var(--border);
+      background:#fff;cursor:pointer;font-size:18px;transition:.18s ease;
+    }
+    .nav-btn:hover{transform:translateY(-1px)}
+    .weekday-row,.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .weekday{font-size:12px;color:var(--muted);text-align:center;padding:4px 0 8px;font-weight:700}
+    .day{
+      aspect-ratio:1/1;border-radius:14px;border:1px solid transparent;
+      background:#fff;cursor:pointer;font-weight:600;transition:.18s ease;position:relative;
+    }
+    .day:hover{transform:translateY(-1px);border-color:rgba(79,70,229,.25)}
+    .day.selected{
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      color:#fff;box-shadow:0 12px 22px rgba(79,70,229,.18);
+    }
+    .day.outside{background:transparent;border-color:transparent;color:transparent;cursor:default;pointer-events:none}
+    .day.today::after{
+      content:"";position:absolute;left:50%;bottom:7px;width:6px;height:6px;border-radius:50%;
+      transform:translateX(-50%);background:rgba(79,70,229,.55);
+    }
+    .day.selected.today::after{background:rgba(255,255,255,.9)}
+    .section-head{
+      display:flex;justify-content:space-between;align-items:end;gap:12px;margin-top:2px;
+    }
+    .section-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+    .slots{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .slot{
+      border:1px solid var(--border);background:rgba(255,255,255,.92);
+      border-radius:18px;padding:14px 12px;min-height:84px;text-align:left;
+      cursor:pointer;transition:.18s ease;display:flex;flex-direction:column;justify-content:space-between;
     }
     .slot:hover{transform:translateY(-1px)}
     .slot[aria-pressed="true"]{
@@ -203,165 +170,152 @@
     .slot strong{font-size:16px}
     .slot small{color:var(--muted);font-size:12px}
     .slot.free small{color:var(--success)}
-    .slot.booked{
-      opacity:.52;
-      cursor:not-allowed;
-      text-decoration:line-through;
-    }
+    .slot.booked{opacity:.52;cursor:not-allowed;text-decoration:line-through}
     .slot.booked:hover{transform:none}
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:4px;
-    }
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
     .button{
-      border:none;
-      border-radius:16px;
-      padding:14px 18px;
-      font-size:15px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.18s ease;
+      border:none;border-radius:16px;padding:14px 18px;font-size:15px;font-weight:700;
+      cursor:pointer;transition:.18s ease;
     }
     .button:hover{transform:translateY(-1px)}
     .button.primary{
       background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
-      box-shadow:0 14px 28px rgba(79,70,229,.20);
-      flex:1;
+      color:#fff;box-shadow:0 14px 28px rgba(79,70,229,.20);flex:1;
     }
-    .button.secondary{
-      background:rgba(17,24,39,.06);
-      color:#111827;
-    }
-    .button.danger{
-      background:rgba(220,38,38,.10);
-      color:var(--danger);
-    }
+    .button.secondary{background:rgba(17,24,39,.06);color:#111827}
+    .button.danger{background:rgba(220,38,38,.10);color:var(--danger)}
+    .button.ghost{background:#fff;border:1px solid var(--border);color:#111827}
     .result{
-      border-radius:18px;
-      padding:16px;
-      border:1px solid rgba(22,163,74,.18);
-      background:rgba(22,163,74,.08);
-      color:#14532d;
-      line-height:1.5;
-      min-height:84px;
+      border-radius:18px;padding:16px;border:1px solid rgba(22,163,74,.18);
+      background:rgba(22,163,74,.08);color:#14532d;line-height:1.5;min-height:84px;
     }
     .hint{color:var(--muted);font-size:13px;line-height:1.5;margin:0}
     .toolbar{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-bottom:14px;
-      flex-wrap:wrap;
+      display:flex;gap:10px;align-items:center;justify-content:space-between;
+      margin-bottom:14px;flex-wrap:wrap;
     }
     .booking-count{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(17,24,39,.05);
-      border:1px solid rgba(17,24,39,.06);
-      font-size:13px;
-      font-weight:600;
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;
+      border-radius:999px;background:rgba(17,24,39,.05);border:1px solid rgba(17,24,39,.06);
+      font-size:13px;font-weight:600;
     }
-    .dot{
-      width:8px;height:8px;border-radius:999px;background:var(--success);display:inline-block;
+    .muted-box{
+      padding:16px;border-radius:18px;background:rgba(17,24,39,.04);
+      border:1px solid rgba(17,24,39,.06);color:var(--muted);line-height:1.55;
     }
-
     .modal{
-      position:fixed;inset:0;
-      background:rgba(15,23,42,.45);
-      backdrop-filter:blur(8px);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:1000;
-      padding:18px;
+      position:fixed;inset:0;background:rgba(15,23,42,.45);
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      display:none;align-items:center;justify-content:center;z-index:1000;padding:18px;
     }
     .modal.open{display:flex}
     .modal-card{
-      width:min(960px, 100%);
-      max-height:min(86vh, 900px);
-      overflow:auto;
-      background:rgba(255,255,255,.96);
-      border-radius:28px;
-      box-shadow:0 30px 80px rgba(15,23,42,.25);
-      border:1px solid rgba(255,255,255,.72);
-      padding:22px;
+      width:min(1080px,100%);max-height:min(88vh,980px);overflow:auto;
+      background:rgba(255,255,255,.96);border-radius:28px;
+      box-shadow:0 30px 80px rgba(15,23,42,.25);border:1px solid rgba(255,255,255,.72);
+      padding:22px;animation: pop .22s ease both;
     }
     .modal-head{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      margin-bottom:16px;
+      display:flex;justify-content:space-between;gap:12px;align-items:center;
+      margin-bottom:16px;flex-wrap:wrap;
     }
     .modal-head p{margin:4px 0 0;color:var(--muted)}
     .table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0 10px;
+      width:100%;border-collapse:separate;border-spacing:0 10px;
     }
     .table th{
-      text-align:left;
-      font-size:12px;
-      color:var(--muted);
-      font-weight:700;
-      padding:0 12px 4px;
+      text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:0 12px 4px;
     }
     .table td{
-      background:#fff;
-      border-top:1px solid rgba(17,24,39,.06);
-      border-bottom:1px solid rgba(17,24,39,.06);
-      padding:14px 12px;
-      font-size:14px;
+      background:#fff;border-top:1px solid rgba(17,24,39,.06);border-bottom:1px solid rgba(17,24,39,.06);
+      padding:14px 12px;font-size:14px;vertical-align:top;
     }
-    .table tr td:first-child{
-      border-left:1px solid rgba(17,24,39,.06);
-      border-top-left-radius:16px;
-      border-bottom-left-radius:16px;
+    .table tr td:first-child{border-left:1px solid rgba(17,24,39,.06);border-top-left-radius:16px;border-bottom-left-radius:16px}
+    .table tr td:last-child{border-right:1px solid rgba(17,24,39,.06);border-top-right-radius:16px;border-bottom-right-radius:16px}
+    .tag{
+      display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;
+      background:rgba(79,70,229,.08);color:#4338ca;font-size:12px;font-weight:700;
     }
-    .table tr td:last-child{
-      border-right:1px solid rgba(17,24,39,.06);
-      border-top-right-radius:16px;
-      border-bottom-right-radius:16px;
+    .admin-tools{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .card-box{
+      background:#fff;border:1px solid rgba(17,24,39,.06);border-radius:22px;padding:16px;
     }
-    .empty{
-      padding:18px;
-      background:rgba(17,24,39,.04);
-      border-radius:18px;
-      color:var(--muted);
+    .admin-form{display:grid;gap:12px}
+    .admin-form .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .small-note{color:var(--muted);font-size:12px;line-height:1.5;margin-top:6px}
+    .login-grid{display:grid;place-items:center;min-height:100vh;padding:20px}
+    .login-card{
+      width:min(420px,100%);padding:24px;border-radius:28px;
+      background:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.8);
+      box-shadow:0 26px 80px rgba(15,23,42,.18);
     }
-    @media (max-width: 980px){
+    .login-card h2{margin-bottom:6px}
+    .login-card p{margin:0 0 18px;color:var(--muted);line-height:1.5}
+    .login-card .actions{margin-top:10px}
+    .hidden{display:none !important}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pop{from{opacity:0;transform:scale(.98) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    @media (max-width: 1040px){
       .grid{grid-template-columns:1fr}
       .stats{grid-template-columns:1fr}
       .slots{grid-template-columns:1fr}
       .teacher-switch{grid-template-columns:1fr}
+      .admin-tools{grid-template-columns:1fr}
+      .admin-form .row{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div id="loginView" class="login-grid hidden">
+    <div class="login-card">
+      <div class="brand" style="margin-bottom:14px">
+        <div class="logo">ROLF</div>
+        <div>
+          <b>Админ-вход</b>
+          <span>Панель управления записями</span>
+        </div>
+      </div>
+      <h2>Войдите как администратор</h2>
+      <p>После входа будет доступна отдельная панель со всеми записями, редактированием и удалением.</p>
+      <div class="form">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="admin@rolf.ru">
+        </div>
+        <div class="field">
+          <label for="password">Пароль</label>
+          <input id="password" type="password" placeholder="••••••••">
+        </div>
+        <button class="button primary" id="loginBtn" type="button">Войти</button>
+        <button class="button secondary" id="continuePublicBtn" type="button">Вернуться к записи</button>
+      </div>
+      <p class="small-note">Доступ к админ-панели зависит от email из списка администраторов в коде и правил Firebase.</p>
+    </div>
+  </div>
+
+  <div id="appView" class="wrap">
     <div class="top">
       <div class="brand">
-        <div class="logo">AR</div>
+        <div class="logo">ROLF</div>
         <div>
           <b>АС Рольф</b>
           <span>Запись на обучение</span>
         </div>
       </div>
-      <div class="pill" id="dbState">Подключение к базе...</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div class="pill" id="dbState"><span class="dot"></span><span>Подключение к базе...</span></div>
+        <div class="pill hidden" id="adminBadge">Администратор</div>
+        <button class="button ghost hidden" id="adminOpenBtn" type="button">Открыть админ-панель</button>
+        <button class="button secondary hidden" id="logoutBtn" type="button">Выйти</button>
+      </div>
     </div>
 
     <div class="grid">
       <section class="panel left">
         <h1>Запись на обучение</h1>
         <p class="subtitle">
-          Выберите дату, преподавателя и свободное окно. Все записи сохраняются в общей базе,
-          поэтому слоты будут одинаковыми для всех пользователей.
+          Выберите дату, преподавателя и свободное окно. Все записи хранятся в общей базе,
+          а занятые слоты сразу блокируются для остальных пользователей.
         </p>
 
         <div class="stats">
@@ -379,20 +333,31 @@
           </div>
         </div>
 
-        <div style="margin-top:22px" class="form">
+        <div class="form">
           <div class="field">
             <label for="studentName">Ваше имя</label>
             <input id="studentName" type="text" placeholder="Например, Анна" autocomplete="name" />
           </div>
 
           <div class="field">
-            <label for="datePick">Дата обучения</label>
-            <input id="datePick" type="date" />
+            <label>Дата обучения</label>
+            <div class="calendar">
+              <div class="cal-head">
+                <button class="nav-btn" id="prevMonthBtn" type="button">‹</button>
+                <strong id="calendarTitle"></strong>
+                <button class="nav-btn" id="nextMonthBtn" type="button">›</button>
+              </div>
+              <div class="weekday-row">
+                <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
+                <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday">Сб</div><div class="weekday">Вс</div>
+              </div>
+              <div class="days-grid" id="calendarGrid"></div>
+            </div>
+            <div class="small-note">Выбрано: <b id="selectedDateLabel">не выбрано</b></div>
           </div>
 
           <div class="field">
-            <label>Выберите преподавателя</label>
-            <label>(нажмите два раза с паузой в 1 секунду для обновления слотов)</label>
+            <label>Выберите учителя</label>
             <div class="teacher-switch">
               <button class="teacher-btn" data-teacher="Юрий" type="button">
                 <strong>Юрий</strong>
@@ -409,16 +374,17 @@
             <div class="section-head">
               <div>
                 <label style="margin-bottom:2px;display:block">Свободные окна</label>
-                <p id="slotsHint">Сначала выберите дату и преподавателя.</p>
+                <p id="slotsHint">Выберите дату и учителя.</p>
               </div>
+              <span class="tag" id="selectionLabel">Учитель не выбран</span>
             </div>
             <div class="slots" id="slots"></div>
           </div>
 
           <div class="actions">
             <button class="button primary" id="bookBtn" type="button">Записаться</button>
-            <button class="button secondary" id="viewAllBtn" type="button">Посмотреть все записи</button>
-            <button class="button danger" id="resetBtn" type="button">Сбросить</button>
+            <button class="button ghost hidden" id="adminOpenBtn2" type="button">Админ-панель</button>
+            <button class="button secondary" id="resetBtn" type="button">Сбросить</button>
           </div>
 
           <div class="result" id="result">
@@ -430,21 +396,25 @@
       <section class="panel right">
         <div class="toolbar">
           <span class="booking-count"><span class="dot"></span> Общая база записей</span>
-          <span class="pill" id="selectionLabel">Преподаватель не выбран</span>
+          <span class="tag" id="liveStatus">онлайн</span>
         </div>
 
-        <div class="empty" style="margin-bottom:14px">
-          Нажмите на слот, чтобы выбрать время. Занятое окно становится недоступным для других сразу после сохранения в базе.
+        <div class="card-box" style="margin-bottom:14px">
+          <h3 style="margin-bottom:8px">Как это работает</h3>
+          <p class="hint" style="margin-bottom:10px">
+            Для каждой комбинации дата + учитель + время создаётся отдельная запись в Firestore.
+            Когда слот занят, он автоматически блокируется для всех остальных.
+          </p>
+          <p class="hint">Администратор может просматривать, редактировать и удалять брони в отдельной панели.</p>
         </div>
 
-        <h3 style="margin-bottom:10px">Как это работает</h3>
-        <p class="hint" style="margin-bottom:10px">
-          Для каждого сочетания дата + преподаватель + время создаётся одна запись в Firestore.
-          Если слот уже занят, он блокируется для всех пользователей.
-        </p>
-        <p class="hint">
-          Кнопка «Посмотреть все записи» открывает список всех бронирований: кто записан, на какое время и к какому преподавателю.
-        </p>
+        <div class="card-box">
+          <h3 style="margin-bottom:8px">Реальное время</h3>
+          <p class="hint" style="margin-bottom:10px">
+            Слоты и счётчики обновляются сразу после сохранения записи без перезагрузки страницы.
+          </p>
+          <p class="hint">Выбранная дата отображается в календаре и синхронизируется со слотами ниже.</p>
+        </div>
       </section>
     </div>
   </div>
@@ -454,11 +424,67 @@
       <div class="modal-head">
         <div>
           <h2>Все записи</h2>
-          <p>Список всех бронирований из общей базы</p>
+          <p>Полный список броней из общей базы</p>
         </div>
-        <button class="button secondary" id="closeModalBtn" type="button">Закрыть</button>
+        <button class="button secondary" id="closeAllModalBtn" type="button">Закрыть</button>
       </div>
       <div id="allBookingsBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="adminModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2>Админ-панель</h2>
+          <p>Просмотр, редактирование и удаление бронирований</p>
+        </div>
+        <button class="button secondary" id="closeAdminBtn" type="button">Закрыть</button>
+      </div>
+
+      <div class="admin-tools">
+        <div class="card-box">
+          <h3 style="margin-bottom:10px">Все брони</h3>
+          <div id="adminBookingsList" class="muted-box">Загрузка...</div>
+        </div>
+
+        <div class="card-box">
+          <h3 style="margin-bottom:10px">Редактирование</h3>
+          <form id="editForm" class="admin-form">
+            <input type="hidden" id="editDocId" />
+            <div class="row">
+              <div class="field">
+                <label for="editName">Имя</label>
+                <input id="editName" type="text" />
+              </div>
+              <div class="field">
+                <label for="editDate">Дата</label>
+                <input id="editDate" type="date" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="editTeacher">Учитель</label>
+                <select id="editTeacher">
+                  <option>Юрий</option>
+                  <option>Давид</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="editTime">Время</label>
+                <select id="editTime"></select>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="button primary" type="submit">Сохранить изменения</button>
+              <button class="button danger" id="deleteBookingBtn" type="button">Удалить запись</button>
+            </div>
+            <div class="small-note">
+              При сохранении система проверяет, не занят ли новый слот, чтобы не допустить двойного бронирования.
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -470,220 +496,289 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    const teachers = ["Юрий", "Давид"];
+    const ADMIN_EMAILS = ["admin@rolf.ru", "support@rolf.ru"];
     const times = ["10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
 
+    const loginView = document.getElementById("loginView");
+    const appView = document.getElementById("appView");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const continuePublicBtn = document.getElementById("continuePublicBtn");
+
     const dbState = document.getElementById("dbState");
+    const adminBadge = document.getElementById("adminBadge");
+    const adminOpenBtn = document.getElementById("adminOpenBtn");
+    const adminOpenBtn2 = document.getElementById("adminOpenBtn2");
+    const logoutBtn = document.getElementById("logoutBtn");
+
     const studentName = document.getElementById("studentName");
-    const datePick = document.getElementById("datePick");
     const slotsEl = document.getElementById("slots");
     const slotsHint = document.getElementById("slotsHint");
     const resultEl = document.getElementById("result");
     const freeCountEl = document.getElementById("freeCount");
     const bookedCountEl = document.getElementById("bookedCount");
     const selectionLabel = document.getElementById("selectionLabel");
-    const viewAllBtn = document.getElementById("viewAllBtn");
-    const resetBtn = document.getElementById("resetBtn");
+    const liveStatus = document.getElementById("liveStatus");
+    const selectedDateLabel = document.getElementById("selectedDateLabel");
+
+    const prevMonthBtn = document.getElementById("prevMonthBtn");
+    const nextMonthBtn = document.getElementById("nextMonthBtn");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const calendarTitle = document.getElementById("calendarTitle");
+
     const bookBtn = document.getElementById("bookBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
     const allModal = document.getElementById("allModal");
-    const closeModalBtn = document.getElementById("closeModalBtn");
     const allBookingsBody = document.getElementById("allBookingsBody");
+    const closeAllModalBtn = document.getElementById("closeAllModalBtn");
+
+    const adminModal = document.getElementById("adminModal");
+    const closeAdminBtn = document.getElementById("closeAdminBtn");
+    const adminBookingsList = document.getElementById("adminBookingsList");
+    const editForm = document.getElementById("editForm");
+    const editDocId = document.getElementById("editDocId");
+    const editName = document.getElementById("editName");
+    const editDate = document.getElementById("editDate");
+    const editTeacher = document.getElementById("editTeacher");
+    const editTime = document.getElementById("editTime");
+    const deleteBookingBtn = document.getElementById("deleteBookingBtn");
 
     const teacherButtons = [...document.querySelectorAll(".teacher-btn")];
+
+    let isAdmin = false;
+    let bookingsCache = [];
     let selectedTeacher = "";
     let selectedSlot = null;
-    let currentSlots = [];
+    let selectedDate = todayISO();
+    let currentMonth = new Date();
+    let currentListener = null;
+    let activeEditId = "";
 
     function todayISO(){
       const d = new Date();
       const tz = new Date(d.getTime() - d.getTimezoneOffset()*60000);
       return tz.toISOString().slice(0,10);
     }
-
-    datePick.value = todayISO();
-    datePick.min = todayISO();
-
+    function toISODate(date){
+      return new Date(date.getTime() - date.getTimezoneOffset()*60000).toISOString().slice(0,10);
+    }
     function slotDocId(date, teacher, time){
       return `${date}__${teacher}__${time}`.replace(/\s+/g, "_");
     }
-
-    function setTeacher(teacher){
-      selectedTeacher = teacher;
-      selectedSlot = null;
-      teacherButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.teacher === teacher));
-      selectionLabel.textContent = teacher ? `Выбран: ${teacher}` : "Преподаватель не выбран";
-      renderSlots();
-      loadSlots();
+    function setStatus(ok, text){
+      liveStatus.textContent = text || (ok ? "онлайн" : "офлайн");
+      dbState.innerHTML = ok
+        ? '<span class="dot"></span><span>Подключено к базе</span>'
+        : '<span class="dot" style="background:var(--danger);box-shadow:0 0 0 4px rgba(220,38,38,.12)"></span><span>Ошибка базы</span>';
+    }
+    function isAdminEmail(emailValue){
+      return !!emailValue && ADMIN_EMAILS.includes(emailValue.toLowerCase());
+    }
+    function getBookingsFor(date, teacher){
+      return bookingsCache.filter(b => b.date === date && b.teacher === teacher);
     }
 
-    teacherButtons.forEach(btn => {
-      btn.addEventListener("click", () => setTeacher(btn.dataset.teacher));
-    });
+    function renderTeacherButtons(){
+      teacherButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.teacher === selectedTeacher));
+      selectionLabel.textContent = selectedTeacher ? `Выбран: ${selectedTeacher}` : "Учитель не выбран";
+    }
 
-    async function loadSlots(){
-      if (!datePick.value || !selectedTeacher){
-        currentSlots = [];
-        updateStats();
-        return;
-      }
+    function monthName(date){
+      return new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" }).format(date);
+    }
+    function mondayIndex(jsDay){ return jsDay === 0 ? 6 : jsDay - 1; }
 
-      dbState.textContent = "Обновление слотов...";
-      const refs = times.map(time => db.collection("rolf_bookings").doc(slotDocId(datePick.value, selectedTeacher, time)));
-      const snaps = await Promise.all(refs.map(ref => ref.get()));
+    function renderCalendar(){
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+      calendarTitle.textContent = monthName(currentMonth);
 
-      currentSlots = snaps.map((snap, idx) => {
-        const time = times[idx];
-        if (!snap.exists) {
-          return { time, booked: false };
+      const first = new Date(year, month, 1);
+      const firstDay = mondayIndex(first.getDay());
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const today = todayISO();
+
+      const cells = [];
+      for (let i = 0; i < firstDay; i++) cells.push(null);
+      for (let day = 1; day <= daysInMonth; day++) cells.push(new Date(year, month, day));
+      while (cells.length % 7 !== 0) cells.push(null);
+
+      calendarGrid.innerHTML = "";
+      cells.forEach(d => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        if (!d){
+          btn.className = "day outside";
+          btn.textContent = "0";
+          btn.disabled = true;
+        } else {
+          const iso = toISODate(d);
+          btn.className = "day";
+          if (iso === selectedDate) btn.classList.add("selected");
+          if (iso === today) btn.classList.add("today");
+          btn.textContent = d.getDate();
+          btn.addEventListener("click", () => {
+            selectedDate = iso;
+            selectedSlot = null;
+            selectedDateLabel.textContent = selectedDate;
+            renderCalendar();
+            renderSlots();
+            refreshLiveListener();
+          });
         }
-        const data = snap.data();
-        return {
-          time,
-          booked: !!data.bookedBy,
-          data
-        };
+        calendarGrid.appendChild(btn);
       });
 
-      updateStats();
-      dbState.textContent = "База подключена";
+      selectedDateLabel.textContent = selectedDate || "не выбрано";
     }
 
-    function updateStats(){
-      if (!selectedTeacher || !datePick.value || !currentSlots.length){
+    function updateCounts(){
+      if (!selectedDate || !selectedTeacher){
         freeCountEl.textContent = "0";
         bookedCountEl.textContent = "0";
         return;
       }
-      const booked = currentSlots.filter(s => s.booked).length;
-      const free = currentSlots.length - booked;
+      const booked = getBookingsFor(selectedDate, selectedTeacher).length;
+      const free = times.length - booked;
       freeCountEl.textContent = free;
       bookedCountEl.textContent = booked;
     }
 
     function renderSlots(){
       slotsEl.innerHTML = "";
-      if (!datePick.value){
-        slotsEl.innerHTML = '<div class="empty" style="grid-column:1/-1">Выберите дату.</div>';
+      if (!selectedDate){
+        slotsEl.innerHTML = '<div class="muted-box" style="grid-column:1/-1">Выберите дату в календаре.</div>';
         slotsHint.textContent = "Сначала выберите дату.";
+        updateCounts();
         return;
       }
       if (!selectedTeacher){
-        slotsEl.innerHTML = '<div class="empty" style="grid-column:1/-1">Выберите преподавателя.</div>';
-        slotsHint.textContent = "Сначала выберите преподавателя.";
+        slotsEl.innerHTML = '<div class="muted-box" style="grid-column:1/-1">Выберите учителя.</div>';
+        slotsHint.textContent = "Сначала выберите учителя.";
+        updateCounts();
         return;
       }
 
-      slotsHint.textContent = `Показываю слоты на ${datePick.value} для ${selectedTeacher}.`;
+      const dayBookings = getBookingsFor(selectedDate, selectedTeacher);
+      slotsHint.textContent = `Показываю слоты на ${selectedDate} для ${selectedTeacher}.`;
 
-      times.forEach((time, index) => {
-        const slotData = currentSlots.find(s => s.time === time) || { time, booked: false };
+      times.forEach(time => {
+        const booked = dayBookings.some(b => b.time === time);
+        const item = dayBookings.find(b => b.time === time);
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = `slot ${slotData.booked ? "booked" : "free"}`;
-        btn.disabled = slotData.booked;
+        btn.className = `slot ${booked ? "booked" : "free"}`;
+        btn.disabled = booked;
         btn.setAttribute("aria-pressed", selectedSlot === time ? "true" : "false");
         btn.innerHTML = `
           <strong>${time}</strong>
-          <small>${slotData.booked ? "занято" : "свободно"}</small>
+          <small>${booked ? "занято" : "свободно"}</small>
         `;
-
         btn.addEventListener("click", () => {
-          if (slotData.booked) return;
+          if (booked) return;
           selectedSlot = time;
           [...slotsEl.querySelectorAll(".slot")].forEach(el => el.setAttribute("aria-pressed", "false"));
           btn.setAttribute("aria-pressed", "true");
-          resultEl.innerHTML = `Вы выбрали <b>${datePick.value}</b>, <b>${selectedTeacher}</b>, <b>${time}</b>. Нажмите «Записаться».`;
+          resultEl.innerHTML = `Вы выбрали <b>${selectedDate}</b>, <b>${selectedTeacher}</b>, <b>${time}</b>. Нажмите «Записаться».`;
         });
-
         slotsEl.appendChild(btn);
       });
+
+      updateCounts();
     }
 
-    async function refresh(){
-      selectedSlot = null;
-      await loadSlots();
-      renderSlots();
-    }
-
-    datePick.addEventListener("change", refresh);
-
-    async function bookSlot(){
-      const name = studentName.value.trim();
-      if (!name){
-        resultEl.textContent = "Введите ваше имя.";
-        studentName.focus();
-        return;
-      }
-      if (!datePick.value){
-        resultEl.textContent = "Выберите дату.";
-        datePick.focus();
-        return;
-      }
-      if (!selectedTeacher){
-        resultEl.textContent = "Выберите преподавателя.";
-        return;
-      }
-      if (!selectedSlot){
-        resultEl.textContent = "Выберите свободное окно времени.";
-        return;
-      }
-
-      const docRef = db.collection("rolf_bookings").doc(slotDocId(datePick.value, selectedTeacher, selectedSlot));
-
-      try{
-        await db.runTransaction(async (tx) => {
-          const snap = await tx.get(docRef);
-          if (snap.exists && snap.data().bookedBy) {
-            throw new Error("Этот слот уже занят.");
-          }
-          tx.set(docRef, {
-            date: datePick.value,
-            teacher: selectedTeacher,
-            time: selectedSlot,
-            bookedBy: name,
-            bookedAt: new Date().toISOString(),
-          }, { merge: true });
+    function refreshLiveListener(){
+      if (currentListener) currentListener();
+      currentListener = db.collection("rolf_bookings").onSnapshot(snap => {
+        const list = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (!d || !d.bookedBy) return;
+          list.push({ id: doc.id, ...d });
         });
-
-        resultEl.innerHTML = `
-          <b>Запись подтверждена.</b><br>
-          ${name}, вы записаны к преподавателю <b>${selectedTeacher}</b> на <b>${selectedSlot}</b> (${datePick.value}).<br>
-          Слот теперь недоступен для других.
-        `;
-        await refresh();
-      } catch (err){
-        resultEl.textContent = err?.message || "Не удалось сохранить запись.";
-        await refresh();
-      }
+        bookingsCache = list;
+        renderSlots();
+        renderTeacherButtons();
+        if (isAdmin) renderAdminList();
+        if (allModal.classList.contains("open")) renderAllBookings();
+        if (adminModal.classList.contains("open")) renderAdminTable();
+        setStatus(true, "онлайн");
+      }, err => {
+        console.error(err);
+        setStatus(false, "ошибка базы");
+      });
     }
 
-    async function loadAllBookings(){
-      allBookingsBody.innerHTML = "<div class='empty'>Загрузка...</div>";
+    function renderAdminList(){
+      if (!isAdmin) return;
+      const rows = [...bookingsCache].sort((a,b) => `${a.date}_${a.teacher}_${a.time}`.localeCompare(`${b.date}_${b.teacher}_${b.time}`));
+      if (!rows.length){
+        adminBookingsList.innerHTML = '<div class="muted-box">Пока нет записей.</div>';
+        return;
+      }
+      adminBookingsList.innerHTML = rows.map(b => `
+        <div class="muted-box" style="margin-bottom:10px">
+          <b>${escapeHtml(b.bookedBy || "")}</b><br>
+          <span>${escapeHtml(b.date || "")} · ${escapeHtml(b.time || "")} · ${escapeHtml(b.teacher || "")}</span><br>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button class="button secondary" type="button" onclick="window.__editBooking('${escapeJs(b.id)}')">Редактировать</button>
+            <button class="button danger" type="button" onclick="window.__removeBooking('${escapeJs(b.id)}')">Удалить</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderAdminTable(){
+      const rows = [...bookingsCache].sort((a,b) => `${a.date}_${a.teacher}_${a.time}`.localeCompare(`${b.date}_${b.teacher}_${b.time}`));
+      if (!rows.length){
+        adminBookingsList.innerHTML = '<div class="muted-box">Пока нет записей.</div>';
+        return;
+      }
+      adminBookingsList.innerHTML = rows.map(b => `
+        <div class="muted-box" style="margin-bottom:10px">
+          <b>${escapeHtml(b.bookedBy || "")}</b><br>
+          <span>${escapeHtml(b.date || "")} · ${escapeHtml(b.time || "")} · ${escapeHtml(b.teacher || "")}</span><br>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button class="button secondary" type="button" onclick="window.__editBooking('${escapeJs(b.id)}')">Редактировать</button>
+            <button class="button danger" type="button" onclick="window.__removeBooking('${escapeJs(b.id)}')">Удалить</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function openAdmin(){
+      if (!isAdmin) return;
+      loadEditTimeOptions();
+      renderAdminTable();
+      adminModal.classList.add("open");
+      adminModal.setAttribute("aria-hidden", "false");
+    }
+    function closeAdmin(){
+      adminModal.classList.remove("open");
+      adminModal.setAttribute("aria-hidden", "true");
+    }
+    function openAll(){
+      if (!isAdmin) return;
+      renderAllBookings();
       allModal.classList.add("open");
       allModal.setAttribute("aria-hidden", "false");
+    }
+    function closeAll(){
+      allModal.classList.remove("open");
+      allModal.setAttribute("aria-hidden", "true");
+    }
 
-      const snap = await db.collection("rolf_bookings").get();
-      const rows = [];
-      snap.forEach(doc => {
-        const d = doc.data();
-        if (!d.bookedBy) return;
-        rows.push(d);
-      });
-
-      rows.sort((a,b) => {
-        const k1 = `${a.date}_${a.teacher}_${a.time}`;
-        const k2 = `${b.date}_${b.teacher}_${b.time}`;
-        return k1.localeCompare(k2);
-      });
-
+    function renderAllBookings(){
+      const rows = [...bookingsCache].sort((a,b) => `${a.date}_${a.teacher}_${a.time}`.localeCompare(`${b.date}_${b.teacher}_${b.time}`));
       if (!rows.length){
-        allBookingsBody.innerHTML = "<div class='empty'>Пока нет записей.</div>";
+        allBookingsBody.innerHTML = '<div class="muted-box">Пока нет записей.</div>';
         return;
       }
-
       const table = document.createElement("table");
       table.className = "table";
       table.innerHTML = `
@@ -692,7 +787,8 @@
             <th>Имя</th>
             <th>Дата</th>
             <th>Время</th>
-            <th>Преподаватель</th>
+            <th>Учитель</th>
+            <th>Действие</th>
           </tr>
         </thead>
         <tbody>
@@ -702,6 +798,7 @@
               <td>${escapeHtml(r.date || "")}</td>
               <td>${escapeHtml(r.time || "")}</td>
               <td>${escapeHtml(r.teacher || "")}</td>
+              <td><button class="button secondary" type="button" onclick="window.__editBooking('${escapeJs(r.id)}')">Открыть</button></td>
             </tr>
           `).join("")}
         </tbody>
@@ -709,6 +806,223 @@
       allBookingsBody.innerHTML = "";
       allBookingsBody.appendChild(table);
     }
+
+    function loadEditTimeOptions(){
+      editTime.innerHTML = times.map(t => `<option value="${t}">${t}</option>`).join("");
+    }
+
+    function populateEditForm(id){
+      const item = bookingsCache.find(b => b.id === id);
+      if (!item) return;
+      activeEditId = id;
+      editDocId.value = id;
+      editName.value = item.bookedBy || "";
+      editDate.value = item.date || todayISO();
+      editTeacher.value = item.teacher || "Юрий";
+      loadEditTimeOptions();
+      editTime.value = item.time || "10:00";
+      openAdmin();
+      editForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function removeBooking(id){
+      if (!isAdmin) return;
+      if (!confirm("Удалить запись?")) return;
+      await db.collection("rolf_bookings").doc(id).delete();
+      resultEl.textContent = "Запись удалена.";
+      refreshLiveListener();
+    }
+
+    async function saveEdit(e){
+      e.preventDefault();
+      if (!isAdmin) return;
+      const id = editDocId.value;
+      if (!id) return;
+
+      const newData = {
+        bookedBy: editName.value.trim(),
+        date: editDate.value,
+        teacher: editTeacher.value,
+        time: editTime.value,
+      };
+      if (!newData.bookedBy || !newData.date || !newData.teacher || !newData.time) return;
+
+      const newId = slotDocId(newData.date, newData.teacher, newData.time);
+      const oldRef = db.collection("rolf_bookings").doc(id);
+      const newRef = db.collection("rolf_bookings").doc(newId);
+
+      try{
+        await db.runTransaction(async tx => {
+          const [oldSnap, newSnap] = await Promise.all([tx.get(oldRef), tx.get(newRef)]);
+          if (!oldSnap.exists) throw new Error("Старая запись не найдена.");
+          if (newId !== id && newSnap.exists && newSnap.data().bookedBy) {
+            throw new Error("Новый слот уже занят.");
+          }
+          tx.delete(oldRef);
+          tx.set(newRef, {
+            ...newData,
+            bookedAt: oldSnap.data().bookedAt || new Date().toISOString(),
+            editedAt: new Date().toISOString()
+          }, { merge: true });
+        });
+
+        editDocId.value = newId;
+        activeEditId = newId;
+        resultEl.innerHTML = `<b>Запись обновлена.</b><br>${escapeHtml(newData.bookedBy)} · ${escapeHtml(newData.date)} · ${escapeHtml(newData.time)} · ${escapeHtml(newData.teacher)}`;
+        refreshLiveListener();
+      }catch(err){
+        alert(err?.message || "Не удалось сохранить изменения.");
+      }
+    }
+
+    async function bookSlot(){
+      const name = studentName.value.trim();
+      if (!name){
+        resultEl.textContent = "Введите ваше имя.";
+        studentName.focus();
+        return;
+      }
+      if (!selectedDate){
+        resultEl.textContent = "Выберите дату.";
+        return;
+      }
+      if (!selectedTeacher){
+        resultEl.textContent = "Выберите учителя.";
+        return;
+      }
+      if (!selectedSlot){
+        resultEl.textContent = "Выберите свободное окно времени.";
+        return;
+      }
+
+      const docId = slotDocId(selectedDate, selectedTeacher, selectedSlot);
+      const docRef = db.collection("rolf_bookings").doc(docId);
+
+      try{
+        await db.runTransaction(async tx => {
+          const snap = await tx.get(docRef);
+          if (snap.exists && snap.data().bookedBy) {
+            throw new Error("Этот слот уже занят.");
+          }
+          tx.set(docRef, {
+            date: selectedDate,
+            teacher: selectedTeacher,
+            time: selectedSlot,
+            bookedBy: name,
+            bookedAt: new Date().toISOString()
+          }, { merge: true });
+        });
+
+        resultEl.innerHTML = `
+          <b>Запись подтверждена.</b><br>
+          ${escapeHtml(name)}, вы записаны к преподавателю <b>${escapeHtml(selectedTeacher)}</b> на <b>${escapeHtml(selectedSlot)}</b> (${escapeHtml(selectedDate)}).<br>
+          Слот теперь недоступен для других.
+        `;
+        selectedSlot = null;
+        refreshLiveListener();
+      }catch(err){
+        resultEl.textContent = err?.message || "Не удалось сохранить запись.";
+        refreshLiveListener();
+      }
+    }
+
+    function clearForm(){
+      studentName.value = "";
+      selectedTeacher = "";
+      selectedSlot = null;
+      selectedDate = todayISO();
+      currentMonth = new Date();
+      renderTeacherButtons();
+      renderCalendar();
+      renderSlots();
+      resultEl.textContent = "Заполните форму, чтобы подтвердить запись.";
+      refreshLiveListener();
+    }
+
+    function setMonth(delta){
+      currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1);
+      renderCalendar();
+    }
+
+    async function handleAuthState(user){
+      if (!user){
+        isAdmin = false;
+        loginView.classList.remove("hidden");
+        appView.classList.add("hidden");
+        adminBadge.classList.add("hidden");
+        adminOpenBtn.classList.add("hidden");
+        adminOpenBtn2.classList.add("hidden");
+        logoutBtn.classList.add("hidden");
+        setStatus(true, "онлайн");
+        return;
+      }
+
+      const emailValue = (user.email || "").toLowerCase();
+      isAdmin = isAdminEmail(emailValue);
+
+      loginView.classList.add("hidden");
+      appView.classList.remove("hidden");
+      adminBadge.classList.toggle("hidden", !isAdmin);
+      adminOpenBtn.classList.toggle("hidden", !isAdmin);
+      adminOpenBtn2.classList.toggle("hidden", !isAdmin);
+      logoutBtn.classList.remove("hidden");
+      dbState.innerHTML = '<span class="dot"></span><span>Подключено к базе</span>';
+      if (isAdmin) adminBadge.textContent = `Администратор · ${emailValue}`;
+      renderCalendar();
+      renderTeacherButtons();
+      refreshLiveListener();
+    }
+
+    loginBtn.addEventListener("click", async () => {
+      try{
+        await auth.signInWithEmailAndPassword(email.value.trim(), password.value);
+      }catch(err){
+        alert(err?.message || "Не удалось войти.");
+      }
+    });
+    continuePublicBtn.addEventListener("click", () => {
+      loginView.classList.add("hidden");
+      appView.classList.remove("hidden");
+    });
+    logoutBtn.addEventListener("click", () => auth.signOut());
+
+    teacherButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedTeacher = btn.dataset.teacher;
+        selectedSlot = null;
+        renderTeacherButtons();
+        renderSlots();
+        refreshLiveListener();
+      });
+    });
+
+    prevMonthBtn.addEventListener("click", () => setMonth(-1));
+    nextMonthBtn.addEventListener("click", () => setMonth(1));
+    bookBtn.addEventListener("click", bookSlot);
+    resetBtn.addEventListener("click", clearForm);
+
+    adminOpenBtn.addEventListener("click", openAdmin);
+    adminOpenBtn2.addEventListener("click", openAdmin);
+    closeAdminBtn.addEventListener("click", closeAdmin);
+    closeAllModalBtn.addEventListener("click", closeAll);
+    allModal.addEventListener("click", (e) => { if (e.target === allModal) closeAll(); });
+    adminModal.addEventListener("click", (e) => { if (e.target === adminModal) closeAdmin(); });
+
+    deleteBookingBtn.addEventListener("click", async () => {
+      if (!activeEditId) return;
+      if (!confirm("Удалить запись?")) return;
+      await db.collection("rolf_bookings").doc(activeEditId).delete();
+      resultEl.textContent = "Запись удалена.";
+      editForm.reset();
+      editDocId.value = "";
+      activeEditId = "";
+      refreshLiveListener();
+    });
+
+    editForm.addEventListener("submit", saveEdit);
+
+    window.__editBooking = (id) => { if (isAdmin) populateEditForm(id); };
+    window.__removeBooking = (id) => removeBooking(id);
 
     function escapeHtml(str){
       return String(str)
@@ -718,37 +1032,39 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#39;");
     }
+    function escapeJs(str){
+      return String(str).replaceAll("\\","\\\\").replaceAll("'","\\'");
+    }
 
-    viewAllBtn.addEventListener("click", loadAllBookings);
-    closeModalBtn.addEventListener("click", () => {
-      allModal.classList.remove("open");
-      allModal.setAttribute("aria-hidden", "true");
-    });
-    allModal.addEventListener("click", (e) => {
-      if (e.target === allModal) closeModalBtn.click();
-    });
+    async function init(){
+      selectedDate = todayISO();
+      currentMonth = new Date();
+      renderTeacherButtons();
+      renderCalendar();
+      loadEditTimeOptions();
 
-    bookBtn.addEventListener("click", bookSlot);
-    resetBtn.addEventListener("click", async () => {
-      studentName.value = "";
-      datePick.value = todayISO();
-      selectedTeacher = "";
-      selectedSlot = null;
-      teacherButtons.forEach(btn => btn.classList.remove("active"));
-      selectionLabel.textContent = "Преподавателя не выбран";
-      resultEl.textContent = "Заполните форму, чтобы подтвердить запись.";
-      await refresh();
-    });
+      auth.onAuthStateChanged(handleAuthState);
 
-    (async function init(){
-      try{
-        await refresh();
-        dbState.textContent = "База подключена";
-      }catch(e){
-        dbState.textContent = "Ошибка подключения к базе";
-        resultEl.textContent = "Не удалось подключиться к базе данных.";
-      }
-    })();
+      db.collection("rolf_bookings").onSnapshot(snap => {
+        const list = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (!d || !d.bookedBy) return;
+          list.push({ id: doc.id, ...d });
+        });
+        bookingsCache = list;
+        renderSlots();
+        if (isAdmin) renderAdminList();
+        if (allModal.classList.contains("open")) renderAllBookings();
+        if (adminModal.classList.contains("open")) renderAdminTable();
+        setStatus(true, "онлайн");
+      }, err => {
+        console.error(err);
+        setStatus(false, "ошибка базы");
+      });
+    }
+
+    init();
   </script>
 </body>
 </html>

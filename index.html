@@ -770,7 +770,6 @@
       adminModal.setAttribute("aria-hidden", "true");
     }
     function openAll(){
-      if (!isAdmin) return;
       renderAllBookings();
       allModal.classList.add("open");
       allModal.setAttribute("aria-hidden", "false");
@@ -795,7 +794,6 @@
             <th>Дата</th>
             <th>Время</th>
             <th>Учитель</th>
-            <th>Действие</th>
           </tr>
         </thead>
         <tbody>
@@ -805,7 +803,6 @@
               <td>${escapeHtml(r.date || "")}</td>
               <td>${escapeHtml(r.time || "")}</td>
               <td>${escapeHtml(r.teacher || "")}</td>
-              <td><button class="button secondary" type="button" onclick="window.__editBooking('${escapeJs(r.id)}')">Открыть</button></td>
             </tr>
           `).join("")}
         </tbody>

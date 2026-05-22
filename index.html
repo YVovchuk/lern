@@ -320,8 +320,7 @@
       <section class="panel left">
         <h1>Запись на обучение</h1>
         <p class="subtitle">
-          Выберите дату, преподавателя и свободное окно. Все записи хранятся в общей базе,
-          а занятые слоты сразу блокируются для остальных пользователей.
+          Выберите дату, преподавателя и свободное окно.
         </p>
 
         <div class="stats">
@@ -409,10 +408,10 @@
         <div class="card-box" style="margin-bottom:14px">
           <h3 style="margin-bottom:8px">Как это работает</h3>
           <p class="hint" style="margin-bottom:10px">
-            Для каждой комбинации дата + учитель + время создаётся отдельная запись в Firestore.
+            Для каждой комбинации дата + учитель + время создаётся отдельная запись в календаре.
             Когда слот занят, он автоматически блокируется для всех остальных.
           </p>
-          <p class="hint">Кнопка «Просмотреть все записи» открывает полный список бронирований из общей базы.</p>
+          <p class="hint">Кнопка «Просмотреть все записи» открывает полный список бронирований.</p>
         </div>
 
         <div class="card-box">
@@ -431,7 +430,6 @@
       <div class="modal-head">
         <div>
           <h2>Все записи</h2>
-          <p>Полный список броней из общей базы</p>
         </div>
         <button class="button secondary" id="closeAllModalBtn" type="button">Закрыть</button>
       </div>
@@ -677,7 +675,7 @@
       }
 
       const dayBookings = getBookingsFor(selectedDate, selectedTeacher);
-      slotsHint.textContent = `Показываю слоты на ${selectedDate} для ${selectedTeacher}.`;
+      slotsHint.textContent = `Слоты на ${selectedDate} для ${selectedTeacher}.`;
 
       times.forEach(time => {
         const booked = dayBookings.some(b => b.time === time);

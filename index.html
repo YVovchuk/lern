@@ -304,7 +304,7 @@
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <div class="pill" id="dbState"><span class="dot"></span><span>Подключение к базе...</span></div>
         <div class="pill hidden" id="adminBadge">Администратор</div>
-        <button class="button ghost" id="adminOpenBtn" type="button">Админ</button>
+        <button class="button ghost hidden" id="adminOpenBtn" type="button">Админ</button>
         <button class="button secondary hidden" id="logoutBtn" type="button">Выйти</button>
       </div>
     </div>
@@ -382,6 +382,7 @@
 
           <div class="actions">
             <button class="button primary" id="bookBtn" type="button">Записаться</button>
+            <button class="button secondary" id="viewAllBtn" type="button">Просмотреть все записи</button>
             <button class="button ghost hidden" id="adminOpenBtn2" type="button">Админ-панель</button>
             <button class="button secondary" id="resetBtn" type="button">Сбросить</button>
           </div>
@@ -404,7 +405,7 @@
             Для каждой комбинации дата + учитель + время создаётся отдельная запись в Firestore.
             Когда слот занят, он автоматически блокируется для всех остальных.
           </p>
-          <p class="hint">Администратор может просматривать, редактировать и удалять брони в отдельной панели.</p>
+          <p class="hint">Кнопка «Просмотреть все записи» открывает полный список бронирований из общей базы.</p>
         </div>
 
         <div class="card-box">
@@ -533,6 +534,7 @@
     const calendarTitle = document.getElementById("calendarTitle");
 
     const bookBtn = document.getElementById("bookBtn");
+    const viewAllBtn = document.getElementById("viewAllBtn");
     const resetBtn = document.getElementById("resetBtn");
 
     const allModal = document.getElementById("allModal");
@@ -1015,6 +1017,7 @@
     prevMonthBtn.addEventListener("click", () => setMonth(-1));
     nextMonthBtn.addEventListener("click", () => setMonth(1));
     bookBtn.addEventListener("click", bookSlot);
+    viewAllBtn.addEventListener("click", openAll);
     resetBtn.addEventListener("click", clearForm);
 
     adminOpenBtn2.addEventListener("click", openAdmin);
